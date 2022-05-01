@@ -59,7 +59,7 @@ run().catch(console.dir);
 
 //tora sobar niche thakbi
 app.get("/", (req, res) => {
-  res.send("database Cholceeeee");
+  res.send("database is running");
 });
 
 app.listen(port, () => {
