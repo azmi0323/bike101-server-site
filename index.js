@@ -32,13 +32,21 @@ async function run() {
       const result = await cursor.limit(limit).skip(skip).toArray();
       res.send(result);
     });
+
+    app.get("/products/:id", async (req, res) => {
+      const id = req.params.id;
+      const filter = { _id: ObjectId(id) };
+      const result = await collection.findOne(filter);
+      res.send( result );
+    });
+
+
+
     app.delete("/product/:id", async (req, res) => {
       const id = req.params.id;
       const filter = { _id: ObjectId(id) };
       const result = await collection.deleteOne(filter);
       res.send({ result });
-
-      console.log(id);
     });
 
     app.post("/products", async (req, res) => {
