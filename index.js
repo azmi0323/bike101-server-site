@@ -23,36 +23,31 @@ async function run() {
     const collection = client.db("makeup").collection("products");
 
     app.get("/products", async (req, res) => {
+      const limit = parseInt(req.query.limit) || 100;
+      const skip = parseInt(req.query.skip) || 0;
 
-        const cursor = collection.find();
-        const result = await cursor.toArray();
-        res.send(result)
+      console.log(limit);
+      const cursor = collection.find();
+
+      const result = await cursor.limit(limit).skip(skip).toArray();
+      res.send(result);
     });
     app.delete("/product/:id", async (req, res) => {
       const id = req.params.id;
-      const filter = {_id:ObjectId(id)}
+      const filter = { _id: ObjectId(id) };
       const result = await collection.deleteOne(filter);
-      res.send({result})
+      res.send({ result });
 
       console.log(id);
     });
 
     app.post("/products", async (req, res) => {
-        const service = req.body;
-        const result = await collection.insertOne(service)
+      const service = req.body;
+      const result = await collection.insertOne(service);
 
-
-        res.send({result})
+      res.send({ result });
     });
-
-
-
-
-
-
-
   } finally {
-    
   }
 }
 run().catch(console.dir);
