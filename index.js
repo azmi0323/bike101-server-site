@@ -48,6 +48,14 @@ async function run() {
       const result = await collection.deleteOne(filter);
       res.send({ result });
     });
+    app.put("/product/:id", async (req, res) => {
+      const updatedItem = req.body.updatedQuantity
+      const id = req.params.id;
+      const filter = { _id: ObjectId(id) };
+      const update = {$set:{quantity: updatedItem }}
+      const result = await collection.updateOne(filter, update);
+      res.send({ result });
+    });
 
     app.post("/products", async (req, res) => {
       const service = req.body;
