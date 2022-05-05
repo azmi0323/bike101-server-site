@@ -10,6 +10,20 @@ const port = process.env.PORT || 5000;
 app.use(cors());
 app.use(express.json());
 
+// token verify
+const tokenVerify = (req, res, next) => {
+  const token = req.headers.authorization;
+  jwt.verify(token, process.env.SECRETE_CODE, function (err, decoded) {
+    if (err) {
+      console.log(err);
+      res.send({ message: err }); //have to done
+      return;
+    }
+    req.decoded = decoded;
+    next();
+  });
+};
+
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.ee5t8.mongodb.net/myFirstDatabase?retryWrites=true&w=majority`;
 const client = new MongoClient(uri, {
   useNewUrlParser: true,
@@ -34,16 +48,14 @@ async function run() {
       res.send(result);
     });
 
-    // app.get("/myItems", async (req, res) => {
-    //   const limit = parseInt(req.query.limit) || 100;
-    //   const skip = parseInt(req.query.skip) || 0;
-
-    //   console.log(limit);
-    //   const cursor = collection.find();
-
-    //   const result = await cursor.limit(limit).skip(skip).toArray();
-    //   res.send(result);
-    // });
+    app.get("/myItems", tokenVerify, async (req, res) => {
+      const { email } = req.decoded;
+      console.log(email);
+      const filter = { email };
+      const cursor = collection.find(filter);
+      const result = await cursor.toArray();
+      res.send(result);
+    });
 
     app.get("/products/:id", async (req, res) => {
       const id = req.params.id;
@@ -76,7 +88,7 @@ async function run() {
 
     app.post("/login", (req, res) => {
       const tokenBody = req.body;
-      var token = jwt.sign(tokenBody, process.env.SECRETE_CODE);
+      const token = jwt.sign(tokenBody, process.env.SECRETE_CODE);
       res.send({ token });
     });
 
